@@ -6,11 +6,77 @@
 #import "ViewController.h"
 #import "ePayLib.h"
 #import "ePayParameter.h"
+#import "AFNetworking.h"
+
+typedef void (^AFFailureBlock)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON);
+typedef void (^AFSuccessBlock)(NSURLRequest *request, NSHTTPURLResponse *response, id JSON);
+typedef void (^WSInternalSuccessBlock)(id JSON);
+typedef void (^WSInternalRetryBlock)(int retries);
+
+@interface WebServiceRequest()
+@property (weak, nonatomic) AFHTTPRequestOperation *request;
+@property (strong, nonatomic) NSMutableArray *childRequests;
+@end
+
+@implementation WebServiceRequest
+
+- (id)init {
+    if ((self = [super init])) {
+        _childRequests = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)cancel {
+    [self.request cancel];
+    for (WebServiceRequest *request in _childRequests) {
+        [request cancel];
+    }
+}
+
+@end
+
+
+@implementation WebServiceFailure
+- (id)initWithError:(NSError*)error {
+    if ((self = [super init])) {
+        self.error = error;
+    }
+    return self;
+}
+
+- (NSString*)description {
+    return self.error.description;
+}
+@end
+
+@implementation ePayParameters
+
+- (NSDictionary*)toJSON {
+    
+    // Declare your unique OrderId
+    NSString *orderId = [NSString stringWithFormat:@"%f", [NSDate timeIntervalSinceReferenceDate]];
+    
+    NSMutableDictionary *JSON = [NSMutableDictionary dictionary];
+    JSON[@"merchantnumber"] = @"99999999";
+    JSON[@"orderid"] = orderId;
+    JSON[@"amount"] = @"100";
+    JSON[@"currency"] = @"DKK";
+    JSON[@"paymenttype"] = @"1";
+    JSON[@"cssurl"] = @"https://raw.github.com/ePay/paymentwindow-cssurl-example/master/style.css";
+    
+    return JSON;
+}
+
+@end
 
 @interface ViewController ()
 {
     ePayLib* epaylib;
+    
 }
+
+@property (strong, nonatomic) UIWebView *webView;
 
 @end
 
@@ -20,7 +86,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    // Do any additional setup after loading the view, typically from a nib.
     
     // Listen to ePay Lib notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(event:) name:PaymentAcceptedNotification object:nil];
@@ -50,45 +116,100 @@
     // Declare your unique OrderId
     NSString *orderId = [NSString stringWithFormat:@"%f", [NSDate timeIntervalSinceReferenceDate]];
     
-    // Init the ePay Lib with parameters and the view to add it to.
-    epaylib = [[ePayLib alloc] initWithView:self.view];
+    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    
+    epaylib = [[ePayLib alloc]init];
+    epaylib.parameters = [[NSMutableArray alloc]init];
     
     // Add parameters to the array
-    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"8013990"]];          //http://tech.epay.dk/en/specification#258
+    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"99999999"]];          //http://tech.epay.dk/en/specification#258
     [epaylib.parameters addObject:[ePayParameter key:@"currency" value:@"DKK"]];                    //http://tech.epay.dk/en/specification#259
     [epaylib.parameters addObject:[ePayParameter key:@"amount" value:@"100"]];                      //http://tech.epay.dk/en/specification#260
     [epaylib.parameters addObject:[ePayParameter key:@"orderid" value:orderId]];                    //http://tech.epay.dk/en/specification#261
-    //[parameters addObject:[KeyValue initKey:@"windowid" value:@"1"]];                             //http://tech.epay.dk/en/specification#262
-    [epaylib.parameters addObject:[ePayParameter key:@"paymentcollection" value:@"0"]];             //http://tech.epay.dk/en/specification#263
-    [epaylib.parameters addObject:[ePayParameter key:@"lockpaymentcollection" value:@"0"]];         //http://tech.epay.dk/en/specification#264
-    //[parameters addObject:[KeyValue initKey:@"paymenttype" value:@"1,2,3"]];                      //http://tech.epay.dk/en/specification#265
-    [epaylib.parameters addObject:[ePayParameter key:@"language" value:@"0"]];                      //http://tech.epay.dk/en/specification#266
-    [epaylib.parameters addObject:[ePayParameter key:@"encoding" value:@"UTF-8"]];                  //http://tech.epay.dk/en/specification#267
-    //[parameters addObject:[KeyValue initKey:@"mobilecssurl" value:@""]];                          //http://tech.epay.dk/en/specification#269
-    [epaylib.parameters addObject:[ePayParameter key:@"instantcapture" value:@"0"]];                //http://tech.epay.dk/en/specification#270
-    //[parameters addObject:[KeyValue initKey:@"splitpayment" value:@"0"]];                         //http://tech.epay.dk/en/specification#272
-    //[parameters addObject:[KeyValue initKey:@"callbackurl" value:@""]];                           //http://tech.epay.dk/en/specification#275
-    [epaylib.parameters addObject:[ePayParameter key:@"instantcallback" value:@"1"]];               //http://tech.epay.dk/en/specification#276
-    [epaylib.parameters addObject:[ePayParameter key:@"ordertext" value:@"iOS Test"]];              //http://tech.epay.dk/en/specification#278
-    //[parameters addObject:[KeyValue initKey:@"group" value:@"group"]];                            //http://tech.epay.dk/en/specification#279
-    [epaylib.parameters addObject:[ePayParameter key:@"description" value:@"iOS Test Description"]];//http://tech.epay.dk/en/specification#280
-    //[parameters addObject:[KeyValue initKey:@"hash" value:@""]];                                  //http://tech.epay.dk/en/specification#281
-    //[parameters addObject:[KeyValue initKey:@"subscription" value:@"0"]];                         //http://tech.epay.dk/en/specification#282
-    //[parameters addObject:[KeyValue initKey:@"subscriptionname" value:@"0"]];                     //http://tech.epay.dk/en/specification#283
-    //[parameters addObject:[KeyValue initKey:@"mailreceipt" value:@""]];                           //http://tech.epay.dk/en/specification#284
-    //[parameters addObject:[KeyValue initKey:@"googletracker" value:@"0"]];                        //http://tech.epay.dk/en/specification#286
-    //[parameters addObject:[KeyValue initKey:@"backgroundcolor" value:@""]];                       //http://tech.epay.dk/en/specification#287
-    //[parameters addObject:[KeyValue initKey:@"opacity" value:@""]];                               //http://tech.epay.dk/en/specification#288
-    [epaylib.parameters addObject:[ePayParameter key:@"declinetext" value:@"Decline Text"]];        //http://tech.epay.dk/en/specification#289
+    [epaylib.parameters addObject:[ePayParameter key:@"paymenttype" value:@"1"]];                      //http://tech.epay.dk/en/specification#265
+    [epaylib.parameters addObject:[ePayParameter key:@"mobilecssurl" value:@"http://popquizz.site50.net/themes/Custom_Theme.css"]];
+    [epaylib.parameters addObject:[ePayParameter key:@"mobile" value:@"0"]];
+    [epaylib.parameters addObject:[ePayParameter key:@"windowstate" value:@"2"]];
+        [epaylib.parameters addObject:[ePayParameter key:@"language" value:@"1"]];
+ 
+            [epaylib.parameters addObject:[ePayParameter key:@"iframeheight" value:@"400"]];
+            [epaylib.parameters addObject:[ePayParameter key:@"iframewidth" value:@"360"]];
     
-    // Set the hash key
-    [epaylib setHashKey:@"MartinBilgrau2013"];
+    // Alernativ way
+    NSString *body = @"";
+    for(ePayParameter *parameter in epaylib.parameters){
+        NSString *keyValuePair = [NSString stringWithFormat:@"%@=%@&", parameter.key, parameter.value];
+        
+        body = [body stringByAppendingString:keyValuePair];
+    }
     
-    // Show/hide the Cancel button
-    [epaylib setDisplayCancelButton:YES];
+    body = [body substringToIndex:[body length]-1]; // Remove the last &
     
-    // Load the payment window
-    [epaylib loadPaymentWindow];
+    NSString *urlString = @"https://ssl.ditonlinebetalingssystem.dk/integration/ewindow/Default.aspx";
+    urlString = [urlString stringByAppendingString:[NSString stringWithFormat:@"?%@", body]];
+    NSURL *url = [NSURL URLWithString: urlString];
+    NSLog(@"%@", urlString);
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:url];
+    
+    [_webView loadRequest:request];
+    [self.view addSubview:_webView];
+    
+    //    // Show/hide the Cancel button
+    //    [epaylib setDisplayCancelButton:YES];
+    
+    _webView.delegate = self;
+    //    // Load the payment window
+    //    [epaylib loadPaymentWindow];
+    
+}
+
+//-(void)initPayment {
+//    NSString *orderId = [NSString stringWithFormat:@"%f", [NSDate timeIntervalSinceReferenceDate]];
+//
+//    // Init the ePay Lib with parameters and the view to add it to.
+//    epaylib = [[ePayLib alloc] init];
+//    epaylib.parameters = [[NSMutableArray alloc]init];
+//
+//    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+//
+//    // Add parameters to the array
+//    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"8025117"]];          //http://tech.epay.dk/en/specification#258
+//    [epaylib.parameters addObject:[ePayParameter key:@"currency" value:@"DKK"]];                    //http://tech.epay.dk/en/specification#259
+//    [epaylib.parameters addObject:[ePayParameter key:@"amount" value:@"100"]];                      //http://tech.epay.dk/en/specification#260
+//    [epaylib.parameters addObject:[ePayParameter key:@"orderid" value:orderId]];                    //http://tech.epay.dk/en/specification#261
+//    [epaylib.parameters addObject:[ePayParameter key:@"paymenttype" value:@"1,3,4,7"]];                      //http://tech.epay.dk/en/specification#265
+//
+//    NSString *htmlFile = [[NSBundle mainBundle] pathForResource:@"epaywindow" ofType:@"html"];
+//    NSString* htmlString = [NSString stringWithContentsOfFile:htmlFile encoding:NSUTF8StringEncoding error:nil];
+//    [_webView loadHTMLString:htmlString baseURL: [[NSBundle mainBundle] bundleURL]];
+//
+//    self.webView.delegate = self;
+//    [self.view addSubview:_webView];
+//}
+
+-(void)webViewDidStartLoad:(UIWebView *)webView{
+    NSLog(@"webViewDidStartLoad");
+}
+
+// If we want to manipulate ePay's webview...
+-(void)webViewDidFinishLoad:(UIWebView *)webView{
+    NSLog(@"webViewDidFinishLoad");
+    
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"Custom_Theme" ofType:@"css"];
+    
+    NSString *cssString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+    
+    NSString *createStyle = @"var style = document.createElement('style');";
+    NSString *insertCss = [NSString stringWithFormat:@"style.innerHTML = %@", cssString];
+    NSString *getHeader = @"var head = document.getElementsByTagName('head')[0];";
+    NSString *appendChild = @"head.appendChild(style);";
+
+    [webView stringByEvaluatingJavaScriptFromString:createStyle];
+    [webView stringByEvaluatingJavaScriptFromString:insertCss];
+    [webView stringByEvaluatingJavaScriptFromString:getHeader];
+    [webView stringByEvaluatingJavaScriptFromString:appendChild];
+    
+    NSLog(@"%@\n%@\n%@\n%@", createStyle, insertCss, getHeader, appendChild);
 }
 
 - (void)event:(NSNotification*)notification {
@@ -132,5 +253,110 @@
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     }
 }
+
+- (WebServiceRequest *)requestPaymentWithSavedCardParameters:(ePayParameters*)parameters
+                                                     success:(void (^)(NSString *response))success
+                                                     failure:(WSFailureBlock)failure
+{
+    WebServiceRequest *request = [[WebServiceRequest alloc]init];
+    [self requestPaymentWithSavedCardParameters:parameters success:success failure:failure wsRequest:request retries:3];
+    return request;
+}
+
+-(void)requestPaymentWithSavedCardParameters:(ePayParameters*)parameters
+                                     success:(void (^)(NSString *response))success
+                                     failure:(WSFailureBlock)failure
+                                   wsRequest:(WebServiceRequest *)wsRequest
+                                     retries:(int)retries
+{
+    NSString *path = @"https://ssl.ditonlinebetalingssystem.dk/integration/ewindow/Default.aspx";
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc]initWithBaseURL:[NSURL URLWithString:path]];
+    [httpClient setDefaultHeader:@"Accept" value:@"text/html"];
+    NSMutableURLRequest *request = [httpClient requestWithMethod:@"POST" path:path parameters:parameters.toJSON];
+    
+    NSLog(@"requestPaymentWithSavedCardParameters REQUEST PATH: %@\nJSON: %@", path, parameters.toJSON);
+    
+    request.cachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+    
+    AFFailureBlock failureBlock = [ViewController
+                                   failureBlockWithRequest:wsRequest
+                                   internalRetryBlock:^(int retries) {
+                                       
+                                       NSLog(@"FAILED REQUEST requestPaymentWithSavedCardParameters");
+                                       if (retries > 0){
+                                           [self requestPaymentWithSavedCardParameters:parameters
+                                                                               success:success
+                                                                               failure:failure
+                                                                             wsRequest:wsRequest
+                                                                               retries:retries-1];
+                                       }
+                                       else{
+                                           WebServiceFailure *fail = [[WebServiceFailure alloc] initWithError:nil];
+                                           failure(fail);
+                                       }
+                                       
+                                   }
+                                   failureBlock:failure
+                                   retries:retries];
+    
+    AFSuccessBlock successBlock = [ViewController
+                                   successBlockWithRequest:wsRequest
+                                   internalSuccessBlock:^(id JSON) {
+                                       
+                                       NSLog(@"requestPaymentWithSavedCardParameters RESPONSE PATH: %@\nJSON: %@", path, JSON);
+                                       // Don't send anything back for now...
+                                       success(nil);
+                                       
+                                   } failureBlock:failureBlock];
+    
+    wsRequest.request = [AFJSONRequestOperation
+                         JSONRequestOperationWithRequest:request
+                         success:successBlock
+                         failure:failureBlock];
+    [wsRequest.request start];
+    
+}
+
++ (AFSuccessBlock)successBlockWithRequest:(WebServiceRequest *)wsRequest
+                     internalSuccessBlock:(WSInternalSuccessBlock)successBlock
+                             failureBlock:(AFFailureBlock)failureBlock {
+    AFSuccessBlock block = ^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        if (wsRequest.request.isCancelled) {
+            return;
+        }
+        if (!JSON) {
+            failureBlock(request, response, nil, nil);
+            return;
+        }
+        successBlock(JSON);
+    };
+    return block;
+}
+
+
++ (AFFailureBlock)failureBlockWithRequest:(WebServiceRequest*)wsRequest internalRetryBlock:(WSInternalRetryBlock)retryBlock failureBlock:(WSFailureBlock)failureBlock  retries:(int)retries {
+    AFFailureBlock block = ^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        
+        NSLog(@"WebServiceFailure: %@", error);
+        
+        if (wsRequest.request.isCancelled) {
+            return;
+        }
+        if (retries > 0) {
+            retryBlock(retries);
+            return;
+        }
+        
+        
+        if (failureBlock)
+        {
+            WebServiceFailure *fail = [[WebServiceFailure alloc] initWithError:error];
+            failureBlock(fail);
+        }
+    };
+    
+    return block;
+}
+
 
 @end
