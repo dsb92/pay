@@ -1,9 +1,6 @@
 //
 //  AppDelegate.h
-//  epay_tutorial
-//
-//  Created by David Buhauer on 01/03/16.
-//  Copyright © 2016 David Buhauer. All rights reserved.
+//  ePay Example
 //
 
 #import <UIKit/UIKit.h>
@@ -12,6 +9,4 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-
 @end
-

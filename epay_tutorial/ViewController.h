@@ -1,15 +1,11 @@
 //
 //  ViewController.h
-//  epay_tutorial
-//
-//  Created by David Buhauer on 01/03/16.
-//  Copyright © 2016 David Buhauer. All rights reserved.
+//  ePay Example
 //
 
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
-
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicatorView;
 
 @end
-
