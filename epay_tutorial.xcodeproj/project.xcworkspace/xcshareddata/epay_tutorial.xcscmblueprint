@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "27CAAE65F560A987C87FF7688D4229919EE4AA74",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "612F20262BA331C54129C30777E57CED2DA5F4B6" : 0,
+    "27CAAE65F560A987C87FF7688D4229919EE4AA74" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "8BF9EC1A-41AF-48F4-BCA7-465A3788DA62",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "612F20262BA331C54129C30777E57CED2DA5F4B6" : "Mols-Linien-iOS\/",
+    "27CAAE65F560A987C87FF7688D4229919EE4AA74" : "ePay\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "epay_tutorial",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "epay_tutorial.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/dsb92\/pay.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "27CAAE65F560A987C87FF7688D4229919EE4AA74"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vertica-as\/Mols-Linien-iOS.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "612F20262BA331C54129C30777E57CED2DA5F4B6"
+    }
+  ]
+}

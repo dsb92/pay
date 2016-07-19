@@ -1,0 +1,156 @@
+* {
+    font-family: Arial, Verdana, sans-serif !important;
+    color: #000000 !important;
+}
+body {
+	margin: 10px 0px;
+    padding: 0px;
+    background-image: url('http://www.booking.mols-linien.dk/mols/bookingflow/images/fors-bg-rep-rgb1-25-52.jpg') !important;
+    background-repeat: repeat-x !important;
+    background-color: #011934 !important;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 12px;
+    color: #000000;
+}
+#epay_header_top {
+	background-color: #FFF;
+	height: 20px;
+}
+#epay_main_content {
+	background: none !important;
+}
+#epay_content {
+	margin-top: 0 !important;
+}
+#epay_content_content {
+	padding-top: 10px !important;
+}
+#epay_header_content {
+	height: 80px !important;
+	background: url('http://www.booking.mols-linien.dk/mols/bookingflow/images/quick_booking.png') no-repeat 30px center #fff !important;
+}
+#epay_header_content_left {
+	background: url('http://www.booking.mols-linien.dk/mols/bookingflow/images/subpages-logo.png') no-repeat left center !important;
+	margin-left: 10px;
+	width: 300px;
+	margin-top: 0!important;
+	float: right;
+}
+#epay_header_content_right {
+	display: none;
+}
+#epay_steps {
+	padding-bottom: 15px;
+}
+#epay_steps_list {
+	height: 14px;
+	margin-right: 8px;
+	margin-top: -10px;
+}
+#epay_steps_list li {
+	background-image: none !important;
+	position: relative;
+	height: 14px;
+	line-height: 14px;
+	width: auto !important;
+}
+#epay_steps_list li.steps_list_3:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: -40px;
+	z-index: 1;
+	height: 40px;
+	width: 40px;
+}
+#epay_steps_list li span {
+	padding-left: 25px;
+}
+#epay_steps_list li.steps_list_1.currentstep1 span,
+#epay_steps_list li.steps_list_2.currentstep2 span,
+#epay_steps_list li.steps_list_3.currentstep3 span,
+#epay_steps_list li.steps_list_1.currentstep1 span a,
+#epay_steps_list li.steps_list_2.currentstep2 span a,
+#epay_steps_list li.steps_list_3.currentstep3 span a{
+	font-weight: bold;
+}
+#epay_steps_list li.steps_list_1.currentstep1:after,
+#epay_steps_list li.steps_list_2.currentstep2:after {
+	background: url('') no-repeat right;
+}
+.epay_paymentmethod:hover {
+	background: #F1F1F1 !important;
+}
+.epay_payment_goto_button,
+.epay_payment_button,
+.epay_payment_return_button {
+	background: #70ae63 !important;
+	border-radius: 5px;
+    width: 255px;
+    float: right;
+    margin-top: 10px;
+}
+.epay_payment_goto_button span,
+.epay_payment_button,
+.epay_payment_return_button {
+	color: white !important;
+}
+.epay_payment_goto_button:hover,
+.epay_payment_button:hover,
+.epay_payment_return_button:hover {
+	background: #5a9247 !important;
+}
+#epay_content_bottom_content,
+#epay_content_bottom_bottom {
+	background: #DADADA !important;
+}
+#epay_content_bottom_content_center {
+	width: 400px !important;
+}
+#epay_content_bottom_content_right {
+	width: 153px;
+}
+#epay_content_bottom {
+	border: 25px solid white;
+	margin-top: 1px;
+}
+.epay_paymentmethod.first {
+	border-top: 7px solid #E4E5E3;
+}
+#epay_paymentcollection {
+	margin: 0!important;
+	padding: 30px 30px 20px 30px !important;
+	border-top: 1px solid #E4E5E3;
+}
+#epay_paymentfooter {
+	background: none !important;
+	min-height: 0 !important;
+}
+.epay_tooltip {
+	color: #fff !important;
+}
+#epay_paymentfooter_info {
+	width: 290px !important;
+}
+#epay_paymentfooter_right {
+	width: 370px !important;
+}
+
+#epay_paymentinfo {
+	width: 240px !important;
+}
+#epay_paymentinfo ul li p,
+#epay_paymentinfo_full ul li p {
+	width: 110px;
+}
+#epay_main_header,
+.epay_close_button,
+#epay_main_footer,
+#epay_content_bottom_top,
+#epay_content_top,
+#epay_header_bottom {
+	display: none !important;
+}
+#epay_testmode_message {
+	display: none !important;
+}

@@ -122,18 +122,16 @@ typedef void (^WSInternalRetryBlock)(int retries);
     epaylib.parameters = [[NSMutableArray alloc]init];
     
     // Add parameters to the array
-    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"99999999"]];          //http://tech.epay.dk/en/specification#258
+    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"8025117"]];          //http://tech.epay.dk/en/specification#258
     [epaylib.parameters addObject:[ePayParameter key:@"currency" value:@"DKK"]];                    //http://tech.epay.dk/en/specification#259
     [epaylib.parameters addObject:[ePayParameter key:@"amount" value:@"100"]];                      //http://tech.epay.dk/en/specification#260
     [epaylib.parameters addObject:[ePayParameter key:@"orderid" value:orderId]];                    //http://tech.epay.dk/en/specification#261
-    [epaylib.parameters addObject:[ePayParameter key:@"paymenttype" value:@"1"]];                      //http://tech.epay.dk/en/specification#265
-    [epaylib.parameters addObject:[ePayParameter key:@"mobilecssurl" value:@"http://popquizz.site50.net/themes/Custom_Theme.css"]];
+    [epaylib.parameters addObject:[ePayParameter key:@"paymenttype" value:@"1,3,4,7"]];                      //http://tech.epay.dk/en/specification#265
     [epaylib.parameters addObject:[ePayParameter key:@"mobile" value:@"0"]];
-    [epaylib.parameters addObject:[ePayParameter key:@"windowstate" value:@"2"]];
         [epaylib.parameters addObject:[ePayParameter key:@"language" value:@"1"]];
- 
-            [epaylib.parameters addObject:[ePayParameter key:@"iframeheight" value:@"400"]];
-            [epaylib.parameters addObject:[ePayParameter key:@"iframewidth" value:@"360"]];
+            [epaylib.parameters addObject:[ePayParameter key:@"windowstate" value:@"3"]];
+                //[epaylib.parameters addObject:[ePayParameter key:@"paymentcollection" value:@"1"]];
+
     
     // Alernativ way
     NSString *body = @"";
@@ -198,9 +196,9 @@ typedef void (^WSInternalRetryBlock)(int retries);
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Custom_Theme" ofType:@"css"];
     
     NSString *cssString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    
+    cssString = [cssString stringByReplacingOccurrencesOfString:@"\n" withString:@" "]; // js dom inject doesn't accept line breaks, so remove them
     NSString *createStyle = @"var style = document.createElement('style');";
-    NSString *insertCss = [NSString stringWithFormat:@"style.innerHTML = %@", cssString];
+    NSString *insertCss = [NSString stringWithFormat:@"style.innerHTML = \"%@\";", cssString];
     NSString *getHeader = @"var head = document.getElementsByTagName('head')[0];";
     NSString *appendChild = @"head.appendChild(style);";
 
