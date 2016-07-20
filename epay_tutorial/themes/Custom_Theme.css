@@ -198,7 +198,7 @@ body {
 
 #epay_content_content
 {
-    height: 380px;
+    height: 355px;
 }
 
 #epay_content{
@@ -241,23 +241,47 @@ body {
     display:none !important;
 }
 
+#epay_paymentinfo ul li, #epay_paymentinfo_full ul li
+{
+    height: 18px !important;
+}
+
+/*#ctl00_MainContent_WindowUC1_ctl00_ctl00_AmountLine,*/
+/*#ctl00_MainContent_WindowUC1_ctl00_ctl00_FeeLine{*/
+/*    display: none;*/
+/*}*/
+
+#epay_accept_info_left
+{
+    width: 100% !important;
+}
+
+#epay_accept_info_right
+{
+    width: 100% !important;
+}
+
 .epay_payment_button
 {
     margin-top:-75px;
     float:none;
     border: 0 none;
     border-radius: 5px;
-    width: 255px;
+    width:100% !important;
     float: none;
     margin-top: 10px;
     color: white !important;
+    background-color: #70ae63 !important;
+    background-image: none !important;
+    -webkit-appearance: none !important;
+    text-shadow: 0 1px #4c8a0e !important;
 }
 
 #epay_paymentinfo
 {
-    height: 40px;
-    /* padding-bottom: 100px; */
-    /* margin-top: 15px; */
+    height: 20px;
+    width: 100% !important;
+    margin-top: 0px !important;
 }
 
 #epay_header_top, #epay_header_bottom, #epay_content_top
@@ -280,18 +304,25 @@ body {
 
 #epay_loader
 {
-    width:480px !important;
+    width:100% !important;
+    position: relative !important;
+    left: 0% !important;
+    margin-left: 0px !important;
+}
+
+#epay_loader_top
+{
+    height: 200px !important;
+}
+
+#epay_loader_bottom
+{
+    height: 100px !important;
 }
 
 #epay_accept
 {
     border-bottom:0;
-}
-
-#epay_accept_info_right
-{
-    width:281px !important;
-    border-top:1px solid #d6d9dd;
 }
 
 .mobilenumber_label
@@ -333,14 +364,15 @@ body {
 #epay_paymentcards_form
 {
     float: left;
-    width: 265px;
-    min-height: 150px
+    width: 100%;
+    min-height: 100px;
+    margin-top: 90px;
 }
 
 #epay_paymentcollection
 {
     border-bottom:0;
-    min-height: 250px;
+    height: 270px !important;
 }
 
 #epay_paymentcollection label
@@ -355,19 +387,39 @@ body {
 
 #epay_paymentcards_form ul li
 {
-    height:50px;
+    height:36px;
     margin-top:0;
-    
 }
 
-#epay_paymentcollection input[type='text'], #epay_paymentcollection input[type='tel']
+#epay_paymentcollection input[type=text],
+#epay_paymentcollection input[type=tel]
 {
-    height: 29px;
-    border: 0;
-    width: 120px;
-    float: right;
-    padding-left: 9px;
-    /* padding-right: 9px; */
+    background-image: none !important;
+    height: 19px !important;
+    border: 1px solid #ccc !important;
+    float: right !important;
+    padding-left: 9px !important;
+    text-align: left;
+}
+
+#ctl00_MainContent_WindowUC1_ctl00_ctl00_cardno
+{
+    width: 120px !important;
+}
+
+#ctl00_MainContent_WindowUC1_ctl00_ctl00_cvc
+{
+    width: 30px !important;
+}
+
+#epay_paymentcollection input.valid
+{
+    border-color: #70ae63 !important;
+}
+
+#epay_paymentcollection input.invalid
+{
+    border-color: red !important;
 }
 
 .epay_expmonth_input
@@ -389,9 +441,7 @@ body {
 }
 
 #epay_cvc_help{
-    float: left;
-    margin-left: -25px !important;
-    margin-top: 4px;
+    display: none !important;
 }
 
 
@@ -415,23 +465,40 @@ body {
     margin-left:70px;
 }
 
+#epay_paymentfooter_info div
+{
+    display: inline;
+    margin-right: 15px;
+}
+
 #epay_paymentfooter
 {
     margin: 0;
     background: none;
-    min-height: 50px
-    padding: 10px 35px 15px 15px !important;
+    min-height: 50px;
+    padding: 10px 15px 15px 20px !important;
 }
 
 #epay_paymentfooter_info
 {
     background:none;
-    font-size: 7px;
+    font-size: 12px;
+    margin-bottom: 10px;
 }
 
 #epay_paymentfooter_right
 {
     margin-left:-10px;
+}
+
+#epay_print{
+    display: none;
+}
+
+/* Don't display error messages for now... */
+.epay_cardholder_customvalidation, .epay_cardno_customvalidation, .epay_expmonth_customvalidation, .epay_expyear_customvalidation
+{
+    display: none;
 }
 
 #epay_testmode_message

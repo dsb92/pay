@@ -113,24 +113,28 @@ typedef void (^WSInternalRetryBlock)(int retries);
 }
 
 - (void)initPayment {
+    _startPayment.hidden = true;
+    
     // Declare your unique OrderId
     NSString *orderId = [NSString stringWithFormat:@"%f", [NSDate timeIntervalSinceReferenceDate]];
     
-    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.webViewPlaceholder.frame.size.width, self.webViewPlaceholder.frame.size.height)];
     
     epaylib = [[ePayLib alloc]init];
     epaylib.parameters = [[NSMutableArray alloc]init];
     
     // Add parameters to the array
-    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"8025117"]];          //http://tech.epay.dk/en/specification#258
+    [epaylib.parameters addObject:[ePayParameter key:@"merchantnumber" value:@"99999999"]];          //http://tech.epay.dk/en/specification#258
     [epaylib.parameters addObject:[ePayParameter key:@"currency" value:@"DKK"]];                    //http://tech.epay.dk/en/specification#259
     [epaylib.parameters addObject:[ePayParameter key:@"amount" value:@"100"]];                      //http://tech.epay.dk/en/specification#260
-    [epaylib.parameters addObject:[ePayParameter key:@"orderid" value:orderId]];                    //http://tech.epay.dk/en/specification#261
+    [epaylib.parameters addObject:[ePayParameter key:@"orderid" value:@"84030477"]];                    //http://tech.epay.dk/en/specification#261
     [epaylib.parameters addObject:[ePayParameter key:@"paymenttype" value:@"1,3,4,7"]];                      //http://tech.epay.dk/en/specification#265
     [epaylib.parameters addObject:[ePayParameter key:@"mobile" value:@"0"]];
         [epaylib.parameters addObject:[ePayParameter key:@"language" value:@"1"]];
             [epaylib.parameters addObject:[ePayParameter key:@"windowstate" value:@"3"]];
                 //[epaylib.parameters addObject:[ePayParameter key:@"paymentcollection" value:@"1"]];
+                    [epaylib.parameters addObject:[ePayParameter key:@"ownreceipt" value:@"1"]];
+    [epaylib.parameters addObject:[ePayParameter key:@"accepturl" value:@"http://molslinien.icebreak.org/ml110f.aspx"]];
 
     
     // Alernativ way
@@ -150,7 +154,7 @@ typedef void (^WSInternalRetryBlock)(int retries);
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:url];
     
     [_webView loadRequest:request];
-    [self.view addSubview:_webView];
+    [self.webViewPlaceholder addSubview:_webView];
     
     //    // Show/hide the Cancel button
     //    [epaylib setDisplayCancelButton:YES];
@@ -207,7 +211,35 @@ typedef void (^WSInternalRetryBlock)(int retries);
     [webView stringByEvaluatingJavaScriptFromString:getHeader];
     [webView stringByEvaluatingJavaScriptFromString:appendChild];
     
-    NSLog(@"%@\n%@\n%@\n%@", createStyle, insertCss, getHeader, appendChild);
+    //NSLog(@"%@\n%@\n%@\n%@", createStyle, insertCss, getHeader, appendChild);
+    
+//    // For showing payment receipt side, inject accept button:
+//    // If payment completed, inject accept button.
+//    NSString *button = @"var btn = document.createElement('BUTTON'); btn.addEventListener('click', function(){ window.location = 'completed' }); var t = document.createTextNode('Accepter bekræftelse'); btn.appendChild(t); var element = document.getElementById('epay_accept_info_right'); element.appendChild(btn);";
+//    
+//    [webView stringByEvaluatingJavaScriptFromString: button];
+    
+    NSString *completePaymentJS = @"var button = document.getElementById('ctl00_MainContent_WindowUC1_ctl00_ctl00_btnSubmitForm'); button.addEventListener('click', function(){ window.location}); ";
+    
+}
+
+-(BOOL) webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    NSURL *URL = [request URL];
+    
+    NSString *test = @"http://molslinien.icebreak.org/ml110f.aspx";
+    NSString *comp = URL.absoluteString;
+    
+    if ([comp containsString:@"accepturl"]){
+        return YES;
+    }
+    else{
+        if ([comp rangeOfString: test options:NSCaseInsensitiveSearch].location == NSNotFound){
+            return YES;
+        }
+    }
+    
+    // Payment success
+    return NO;
 }
 
 - (void)event:(NSNotification*)notification {

@@ -26,6 +26,8 @@ typedef void (^WSFailureBlock)(WebServiceFailure *error);
 
 @interface ViewController : UIViewController <UIWebViewDelegate>
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicatorView;
+@property (weak, nonatomic) IBOutlet UIView *webViewPlaceholder;
+@property (weak, nonatomic) IBOutlet UIButton *startPayment;
 
 -(WebServiceRequest *)requestPaymentWithSavedCardParameters:(ePayParameters*)parameters
                                                     success:(void (^)(NSString *response))success
